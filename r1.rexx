@@ -10,6 +10,7 @@ end
 
 csvFile = 'assigned.csv'
 lineNumber = 0
+roster. = ''
 
 dayone= '26/10/2026'
 
@@ -36,6 +37,7 @@ do while lines(csvFile) > 0
     lastName = space(subword(person, 2), 0)
     shortName = substr(firstName, 1, 1) || substr(lastName, 1, 6)    
 
+    roster.shortName = line.5
 
     parse var line.5 before '(' line5_stuff ')' after
     line5_result = translateShift(line5_stuff)
