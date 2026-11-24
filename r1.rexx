@@ -30,7 +30,7 @@ do while lines(csvFile) > 0
     parse var line.5 before '(' line5_stuff ')' after
     line5_result = translateShift(line5_stuff)
     
-    say shortname (tab) line.3 (tab) line5_result
+    say shortname (tab) line.3 (tab) line5_result (tab) fixdate(line.3)
     linenumber = lineNumber + 1
 
 end
@@ -38,7 +38,8 @@ end
 call stream csvFile, 'C', 'CLOSE'
 say "lines " lineNumber
 
-say(date('N','261026','B'))
+say date('S', date('B', '20261026', 'S') + 69, 'B')
+
 
 exit
 
@@ -85,8 +86,12 @@ translateShift: procedure
         when shift = 'UP stuff' then return 'ao'
         when shift = 'AP 0000-2359' then return 'o'
         when shift = 'AA 0800-1800' then return 'ao'
-        otherwise return shift
+        otherwise return "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"
     end
 
-
+fixdate: procedure
+    parse arg inputDate
+    inputDate = strip(inputDate)
+    parse var inputDate day '/' month '/' year
+    return year || right('0' || month, 2, '0') || right('0' || day, 2, '0')
 
