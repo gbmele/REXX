@@ -37,7 +37,11 @@ end
 
 call stream csvFile, 'C', 'CLOSE'
 say "lines " lineNumber
+
+say(date('N','261026','B'))
+
 exit
+
 
 
 
@@ -83,4 +87,6 @@ translateShift: procedure
         when shift = 'AA 0800-1800' then return 'ao'
         otherwise return shift
     end
+
+
 
