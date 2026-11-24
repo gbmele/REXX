@@ -11,9 +11,19 @@ end
 csvFile = 'assigned.csv'
 lineNumber = 0
 
+dayone= '26/10/2026'
+
 do while lines(csvFile) > 0
     csvLine = linein(csvFile)
     parse var csvLine line.1 (tab) line.2 (tab) line.3 (tab) line.4 (tab) line.5 (tab) line.6 (tab) line.7 (tab) line.8 (tab) line.9 (tab) line.10
+
+    /*if strip(line.3) = 'Duty Date' then iterate*/
+    /*another way of skipping header when you dont care what the actual header is */
+    
+    if lineNumber = 0 then do
+        lineNumber = lineNumber + 1
+        iterate
+    end
     
     /*line 1 is first name last name 
       line 3 is date 
@@ -30,7 +40,7 @@ do while lines(csvFile) > 0
     parse var line.5 before '(' line5_stuff ')' after
     line5_result = translateShift(line5_stuff)
     
-    say shortname (tab) line.3 (tab) line5_result (tab) fixdate(line.3)
+    say shortname (tab) line.3 (tab) line5_result (tab) datediff(dayone, line.3)+1
     linenumber = lineNumber + 1
 
 end
@@ -38,7 +48,7 @@ end
 call stream csvFile, 'C', 'CLOSE'
 say "lines " lineNumber
 
-say date('S', date('B', '20261026', 'S') + 69, 'B')
+
 
 
 exit
@@ -94,4 +104,10 @@ fixdate: procedure
     inputDate = strip(inputDate)
     parse var inputDate day '/' month '/' year
     return year || right('0' || month, 2, '0') || right('0' || day, 2, '0')
+
+dateDiff: procedure
+    parse arg startDate, endDate
+    startDays = date('B', fixdate(startDate), 'S')
+    endDays = date('B', fixdate(endDate), 'S')
+    return endDays - startDays
 
