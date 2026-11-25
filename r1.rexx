@@ -7,12 +7,17 @@ do i = 1 to 10 by 2
     say "x" sp i tab tab i*2
 end
 
+/*INIT*/
+parse arg /*from commandline*/ csvfile dayone
 
-csvFile = 'assigned.csv'
+/*csvFile = 'assigned.csv'  */
+/*dayone= '26/10/2026'*/
+
+
 lineNumber = 0
+rostercount = 0
+rosterkeys. = ''
 roster. = ''
-
-dayone= '26/10/2026'
 
 do while lines(csvFile) > 0
     csvLine = linein(csvFile)
@@ -26,28 +31,60 @@ do while lines(csvFile) > 0
         iterate
     end
     
-    /*line 1 is first name last name 
-      line 3 is date 
-      line 5 is shift
+    /*field 1 is first name last name 
+      field 3 is date 
+      field 5 is shift
 
     */
     
     person = translate(strip(line.2), 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')
     firstName = word(person, 1)
     lastName = space(subword(person, 2), 0)
-    shortName = substr(firstName, 1, 1) || substr(lastName, 1, 6)    
-
-
+    shortName_ = substr(firstName, 1, 1) || substr(lastName, 1, 6)    
+    shortname=strip(shortname_)
+    if roster.shortName = '' then do
+        roster.shortName = shortname
+        rosterCount = rosterCount + 1
+        rosterKeys.rosterCount = strip(shortName)
+    end
+    
+    
     parse var line.5 before '(' line5_stuff ')' after
     line5_result = translateShift(line5_stuff)
     
+    dayIndex = datediff(dayone, line.3) + 1
+    roster.shortName.dayIndex = line5_stuff
+    
+    if roster.shortName = shortName then do
+        roster.shortname.dayindex=line5_result
+    end
+
+
     say shortname (tab) line.3 (tab) line5_result (tab) datediff(dayone, line.3)+1
     linenumber = lineNumber + 1
 
 end
 
+
+
 call stream csvFile, 'C', 'CLOSE'
 say "lines " lineNumber
+
+
+do i = 1 to rosterCount
+    doc = rosterKeys.i
+    say doc '->' roster.doc
+    do day = 1 to 70
+            if roster.doc.day = '' then do
+                    say "roster["||doc||","||day||"] = o;"
+      end
+      else do
+                    sh= roster.doc.day 
+                    say "roster["||doc||","||day||"] = "||sh||";"
+      end
+    end    
+end
+
 
 
 
@@ -56,7 +93,7 @@ exit
 
 
 
-
+/*FUNCTIONS FUNCTIONS */
 
 translateShift: procedure
     parse arg shift
@@ -97,6 +134,7 @@ translateShift: procedure
         when shift = 'UP stuff' then return 'ao'
         when shift = 'AP 0000-2359' then return 'o'
         when shift = 'AA 0800-1800' then return 'ao'
+        when shift = 'UP 1900-2400' then return 'ao'
         otherwise return "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"
     end
 
