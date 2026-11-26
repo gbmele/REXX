@@ -79,8 +79,8 @@ do i = 1 to rosterCount
                     say "roster["||doc||","||day||"] = o;"
       end
       else do
-                    sh= roster.doc.day 
-                    say "roster["||doc||","||day||"] = "||sh||";"
+            sh= roster.doc.day 
+            say "roster["||doc||","||day||"] = "||sh||";"
       end
     end    
 end
@@ -104,7 +104,7 @@ do while  lines(leavefile) > 0
     leave_day1 = datediff(dayone, leave.2) + 1
     leave_day2 = datediff(dayone, leave.3) + 1
     
-    say shortname " " leave_day1 " " leave_day2
+     say shortname " " leave_day1 " " leave_day2
     /**/  
     do dy = leave_day1 while dy <=leave_day2
         if dy >= 1 & dy <= 70 then do
@@ -124,7 +124,7 @@ call stream leavefile, 'C', 'CLOSE'
 
 
 
-exit
+exit /*program*/
 
 
 
