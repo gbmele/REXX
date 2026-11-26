@@ -8,7 +8,7 @@ do i = 1 to 10 by 2
 end
 
 /*INIT*/
-parse arg /*from commandline*/ csvfile dayone
+parse arg /*from commandline*/ dayone csvfile leavefile
 
 /*csvFile = 'assigned.csv'  */
 /*dayone= '26/10/2026'*/
@@ -86,6 +86,41 @@ do i = 1 to rosterCount
 end
 
 
+
+/*process leavefile*/
+discard_header = linein(leavefile)
+do while  lines(leavefile) > 0
+    leaveLine = linein(leavefile)
+    parse var leaveLine . (tab) . (tab) leave.1 (tab) . (tab) . (tab) . (tab) leave.2 (tab) leave.3 (tab) .
+    name = leave.1
+    name = translate(strip(name), 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+    firstName = word(name, 1)
+    lastName = space(subword(name, 2), 0)
+    shortName = substr(firstName, 1, 1) || substr(lastName, 1, 6)
+    shortName = strip(shortName)
+    start_date = leave.2
+    finish_date = leave.3
+
+    leave_day1 = datediff(dayone, leave.2) + 1
+    leave_day2 = datediff(dayone, leave.3) + 1
+    
+    say shortname " " leave_day1 " " leave_day2
+    /**/  
+    do dy = leave_day1 while dy <=leave_day2
+        if dy >= 1 & dy <= 70 then do
+            roster.shortname.dy = 'leave'
+            say "roster["||shortname||","||dy||"] = leave;"
+        end
+    end
+
+
+
+
+
+
+end
+
+call stream leavefile, 'C', 'CLOSE'
 
 
 
