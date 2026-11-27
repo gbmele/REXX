@@ -1,0 +1,70 @@
+/* ========================================================= */
+/* Self-Reading Template Emitter in Classic REXX             */
+/* ========================================================= */
+out_file = "knapsack.mzn"
+
+/* Define values to inject into the template */
+vars.1 = "@N@=5"
+vars.2 = "@MAX_WT@=160"
+vars.3 = "@WEIGHTS@=9, 13, 153, 50, 15"
+vars.4 = "@VALUES@=150, 35, 200, 160, 60"
+vars.0 = 4
+
+/* Emit the template block to file */
+CALL EmitTemplate out_file
+SAY "Generated" out_file
+
+EXIT
+
+/* ========================================================= */
+/* Reads lines between TEMPLATE_START and TEMPLATE_END       */
+/* ========================================================= */
+EmitTemplate: PROCEDURE EXPOSE vars.
+  PARSE ARG fname
+  CALL STREAM fname, "C", "OPEN WRITE REPLACE"
+
+  /* Find the line numbers of the start and end markers */
+  start_line = FindLabel("TEMPLATE_START:") + 2  /* +2 skips label & '/*' */
+  end_line   = FindLabel("TEMPLATE_END:")   - 2  /* -2 skips '*/' & label */
+
+  DO i = start_line TO end_line
+    line = SOURCELINE(i)
+    
+    /* Replace all @KEY@ placeholders on this line */
+    DO v = 1 TO vars.0
+      PARSE VAR vars.v key "=" val
+      line = CHANGESTR(key, line, val)
+    END
+    
+    CALL LINEOUT fname, line
+  END
+
+  CALL LINEOUT fname  /* Close file */
+RETURN
+
+/* Scans the script's own source code to find a marker label */
+FindLabel: PROCEDURE
+  ARG target
+  DO n = 1 TO SOURCELINE()  /* SOURCELINE() with no args = total lines */
+    IF STRIP(TRANSLATE(SOURCELINE(n))) = target THEN RETURN n
+  END
+RETURN 0
+
+/* ========================================================= */
+/* RAW MINIZINC TEMPLATE (Valid REXX comment, zero escaping) */
+/* ========================================================= */
+TEMPLATE_START:
+/*
+% Auto-generated MiniZinc model
+int: n = @N@;
+int: max_weight = @MAX_WT@;
+array[1..n] of int: weight = [@WEIGHTS@];
+array[1..n] of int: value  = [@VALUES@];
+
+array[1..n] of var 0..1: take;
+constraint sum(i in 1..n)(weight[i] * take[i]) <= max_weight;
+solve maximize sum(i in 1..n)(value[i] * take[i]);
+
+output ["Total Value: ", show(sum(i in 1..n)(value[i] * take[i])), "\n"];
+*/
+TEMPLATE_END:
