@@ -1,3 +1,5 @@
+signal on novalue
+
 sp = " "
 tab = '09'x
 say "well done "
@@ -64,7 +66,7 @@ do while lines(csvFile) > 0
     linenumber = lineNumber + 1
 
 end
-
+roster.0=rostercount
 
 
 call stream csvFile, 'C', 'CLOSE'
@@ -121,6 +123,33 @@ do while  lines(leavefile) > 0
 end
 
 call stream leavefile, 'C', 'CLOSE'
+
+PRINTDOCS:
+say "docs"
+do i = 1 to roster.0
+    doc= rosterKeys.i
+    do day = 1 to  70
+        if roster.doc.day = '' then 
+            say doc||" "||day||" "||"o"
+        else
+            say doc||" "||day||" "||roster.doc.day
+    end
+end /*PRINTDOCS*/
+
+
+MINIZINC:
+ENUM:
+enum = "enum docs ={"
+do i = 1 to roster.0
+    doc= rosterKeys.i
+    if i < roster.0 then
+        enum = enum || doc || ","
+    else
+        enum = enum || doc || "};"
+end 
+say enum
+SHIFTS:
+say "enum shifts = {a, c, p, o, apo, ao, po,ua,ua,u};"
 
 
 
