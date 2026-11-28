@@ -153,7 +153,7 @@ say "enum shifts = {a, c, p, o, apo, ao, po,ua,ua,u};"
 
 
 
-exit /*program   dd*/
+exit /*program   deeed*/
 
 
 
